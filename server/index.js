@@ -1,5 +1,6 @@
-import { ApolloServer } from "@apollo/server";
+import { ApolloServer } from "apollo-server-express";
 import { startStandaloneServer } from "@apollo/server/standalone";
+import express from "express";
 
 import db from "./_db.js";
 import { typeDefs } from "./schema.js";
@@ -76,8 +77,11 @@ const server = new ApolloServer({
   resolvers,
 });
 
-const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
-});
+const app = express();
 
-console.log("Server has started");
+server.start().then(() => {
+  server.applyMiddleware({ app, path: "/api" });
+  app.listen(4000, () => {
+    console.log("Server has started");
+  });
+});
